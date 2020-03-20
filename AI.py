@@ -1,5 +1,5 @@
 import gym
-import numpy
+import numpy as np
 
 env = gym.make('BreakoutDeterministic-v4')
 
