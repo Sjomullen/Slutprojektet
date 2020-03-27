@@ -1,5 +1,7 @@
 import gym
 import numpy as np
+import keras
+
 
 env = gym.make('BreakoutDeterministic-v4')
 
@@ -71,7 +73,7 @@ def atari_model(n_actions):
     normalized = keras.layers.Lambda(lambda x: x / 255.0)(frames_input)
 
     # "The first hidden layer convolves 16 8x8 filters with stride 2, again followed by a rectifer nonlinearity"
-    conv_1 = keras.layers.convolutional.Convolution2D(16, 8, 8, subsample=(4, 4), activation='relu')(conv_1)
+    conv_1 = keras.layers.convolutional.Convolution2D(16, 8, 8, subsample=(4, 4), activation='relu')(normalized)
     
     # "The second hidden layer convolves 32 4x4 filters with stride 2, again followed by a rectifier nonlinearity."
     conv_2 = keras.layers.convolutional.Convolution2D(32, 4, 4, subsample=(2, 2), activation='relu')(conv_1)
@@ -86,9 +88,9 @@ def atari_model(n_actions):
     output = keras.layers.Dense(n_actions)(hidden)
 
     # "Finally, we multiply the output by the mask!"
-    filtered_output = keras.layers.merge([output, actions_input], mode='mul')
+    filtered_output = keras.layers.Concatenate([output, actions_input], mode='mul')
 
-
+    
     self.model = keras.models.Model(input=[frames_input, actions_input], output=filtered_output)
     optimizer = keras.optimizer.RMSprop(lr=0.00025, rho=0.95, epsilon=0.01)
     self.model.compile(optimizer, loss='mse')
@@ -108,19 +110,19 @@ class RingBuf:
         if self.end == self.start:
             self.start = (self.start + 1) % len(self.data)
 
-        def __getitem__(self, idx):
-            return self.data[(self.start + idx) % len(self.data)]
+    def __getitem__(self, idx):
+        return self.data[(self.start + idx) % len(self.data)]
 
-        def __len__(self):
-            if self.end < self.start:
-                return self.end + len(self.data) - self.start
+    def __len__(self):
+        if self.end < self.start:
+            return self.end + len(self.data) - self.start
 
-            else:
-                return self.end - self.start
+        else:
+            return self.end - self.start
 
-            def __iter__(self):
-                for i in range(len(self)):
-                    yield self[i]
+    def __iter__(self):
+         for i in range(len(self)):
+             yield self[i]
 
              
 def q_iteration(env, model, state, iteration, memory):
