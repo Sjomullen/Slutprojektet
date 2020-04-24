@@ -1,5 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt
+import os
 
 #  length, width, type/color
 data = [[3,    1.5,  1],
@@ -93,6 +94,27 @@ for i in range(50000):
             target = point[2]
             cost_sum += np.square(pred - target)
             
-        cost.append(cost_sum/len(data))
+        costs.append(cost_sum/len(data))
 
 plt.plot(costs)    
+
+#seeing model prediction
+
+for i in range(len(data)):
+    point = data[i]
+    print(point)
+    z = point[0] * w1 + point[1] * w2 +b
+    pred = sigmoid(z)
+    print("pred:{}".format(pred))
+
+z = mystery_flower[0] * w1 + mystery_flower[1] * w2 +b
+pred = sigmoid(z)
+pred
+
+def which_flower(length, width):
+    z = lenght * w1 + width * w2 + b
+    pred = sigmoid(z)
+    if pred < 0.5:
+        os.system("say blue")
+    else:
+        os.system("say red")
