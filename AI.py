@@ -1,8 +1,10 @@
-import numpy as np 
-import matplotlib.pyplot as plt
-import os
+import numpy as np # importerar numPY som np
+import matplotlib.pyplot as plt # importerar matplotlib som plt
+import os # importerar så att man kan använda os röst
 
-#  length, width, type/color
+# point 1 = red flower  point 0 = blue flower
+
+# length, width, type/color
 data = [[3,    1.5,  1],
         [2,    1,    0],
         [4,    1.5,  1],
@@ -12,29 +14,28 @@ data = [[3,    1.5,  1],
         [5.5,  1,    1],
         [1,    1,    0]]
 
-mystery_flower = [4.5, 1]
+mystery_flower = [4.5, 1] # påhittad blomma som man inte var värde på vilken färg det är
 
 
 
 def sigmoid(x):
-    return(1/(1 + np.exp(-x)))
+    return(1/(1 + np.exp(-x))) # en sigmoid funktion som delas på exponetialfunktionen av x
 
 def sigmoid_p(x):
-    return sigmoid(x) * (1-sigmoid(x))
+    return sigmoid(x) * (1-sigmoid(x)) # här multiplicerar man sigmoid x med sigmoid x -1
 
 T = np.linspace(-6, 6, 100)
 
-plt.plot(T, sigmoid(T), c='r')
-plt.plot(T, sigmoid_p(T), c='b')
+plt.plot(T, sigmoid(T), c='r') # "plottar" hur funktionen ser ut 
+plt.plot(T, sigmoid_p(T), c='b') # -----------||----------------
 
 
 # Training loop
 
-for i in range(1, 1000):
+for i in range(1, 1000): # tränings loop som inte inte behövs
     ri = np.random.randint(len(data))
 
-
-#scatter data
+#scatter data # värderna på blommorna vi har alla värden på och lagt upp dem på en graf
 
 plt.axis([0, 6, 0, 6])
 plt.grid()
@@ -46,18 +47,18 @@ for i in range(len(data)):
         color = "b"
     plt.scatter(point[0], point[1], c=color)
 
-# training loop
+# training loop # här börjar då den riktiga tränings loopen
 
-learning_rate = 0.5
-costs = []
+learning_rate = 0.5 # learning rate är hur snabbt AIn lär sig 
+costs = [] # används för att visa alla värden vi får ut
 
-w1 = np.random.rand()
-w2 = np.random.rand()
-b = np.random.rand()
-
+w1 = np.random.rand() # "vikt 1"
+w2 = np.random.rand() # "vikt 2"
+b = np.random.rand() # bias används för att balansera båda "vikterna"
+ 
 for i in range(50000):
     ri = np.random.randint(len(data))
-    point = data[ri]
+    point = data[ri] #antal "tal" som AIn ska gå igenom
     
     z = point[0] * w1 + point[1] * w2 + b
     pred = sigmoid(z)
@@ -79,10 +80,10 @@ for i in range(50000):
     dcost_dw2 = dcost_dz * dz_dw2
     dcost_db = dcost_dz * dz_db 
     
-    w1 = w1 - learning_rate * dcost_dw1
-    w2 = w2 - learning_rate * dcost_dw2
-    b = b - learning_rate * dcost_db
-    
+    w1 = w1 - learning_rate * dcost_dw1   #
+    w2 = w2 - learning_rate * dcost_dw2   #
+    b = b - learning_rate * dcost_db      #
+                                          # Här tar man learning rate multiplicerat med "kostnaden" minus "vikten" eller "bias" 
     if i % 100 == 0:
         cost_sum = 0
         for j in range(len(data)):
@@ -94,11 +95,13 @@ for i in range(50000):
             target = point[2]
             cost_sum += np.square(pred - target)
             
-        costs.append(cost_sum/len(data))
+        costs.append(cost_sum/len(data)) # Tillhör "costs = []" som används för att visa värden vi får ut efter AIn är klar
 
-plt.plot(costs)    
+plt.plot(costs) # "plottar" upp hur grafen ser ut    
 
 #seeing model prediction
+#seeing model prediction
+# Visar vilke färg blomman har, längd, bredd och exakta värde. allt över 0.5 är röd och allt under 0.5 är blå
 
 for i in range(len(data)):
     point = data[i]
@@ -107,10 +110,18 @@ for i in range(len(data)):
     pred = sigmoid(z)
     print("pred:{}".format(pred))
 
-z = mystery_flower[0] * w1 + mystery_flower[1] * w2 +b
+for i in range(len(data)):
+    point = data[i]
+    print(point)
+    z = point[0] * w1 + point[1] * w2 +b
+    pred = sigmoid(z)
+    print("pred:{}".format(pred))
+
+z = mystery_flower[0] * w1 + mystery_flower[1] * w2 +b # här tar vi reda på vilken färg den "mystiga blomman" har
 pred = sigmoid(z)
 pred
 
+# Här använder vi en metod som berättar vilken färg blomman har (ganska onödig)
 def which_flower(length, width):
     z = lenght * w1 + width * w2 + b
     pred = sigmoid(z)
